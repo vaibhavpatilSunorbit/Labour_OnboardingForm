@@ -9,17 +9,18 @@ import './App.css';
 function App() {
 
   const [openSidebarToggle, setOpenSidebarToggle] = useState(false)
-
-  const OpenSidebar = () => {
-    setOpenSidebarToggle(!openSidebarToggle)
-  }
-
   const [formStatus, setFormStatus] = useState({
     kyc: false,
     personal: false,
     bankDetails: false,
     project: false
   });
+
+  const OpenSidebar = () => {
+    setOpenSidebarToggle(!openSidebarToggle)
+  }
+
+ 
 
   const handleFormSubmit = (formType) => {
     setFormStatus((prevStatus) => ({
@@ -36,6 +37,7 @@ function App() {
         {/* <div className="main-content"> */}
           <Sidebar formStatus={formStatus} openSidebarToggle={openSidebarToggle} OpenSidebar={OpenSidebar}/>
           <Routes>
+          {/* <Route path="/onboarding" element={<OnboardingForm formType="kyc" formStatus={formStatus} onFormSubmit={handleFormSubmit} />} /> */}
             <Route path="/kyc" element={<OnboardingForm formType="kyc" onFormSubmit={handleFormSubmit} />} />
             <Route path="/personal" element={<OnboardingForm formType="personal" onFormSubmit={handleFormSubmit} />} />
             <Route path="/project" element={<OnboardingForm formType="project" onFormSubmit={handleFormSubmit} />} />

@@ -51,14 +51,25 @@ body, html {
 
 .grid-container {
   display: grid;
-  grid-template-columns: 240px 1fr ;
-  grid-template-rows: 0.2fr 3fr;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: auto 1fr;
   grid-template-areas:
-    'sidebar header header header'
-    'sidebar main main main';
+      'header header'
+      'sidebar main';
   height: 100vh;
 }
 
+.header {
+  grid-area: header;
+}
+
+.sidebar {
+  grid-area: sidebar;
+}
+
+.main {
+  grid-area: main;
+}
 /* Header  */
 .header {
   grid-area: header;
@@ -89,7 +100,7 @@ body, html {
 #sidebar {
   grid-area: sidebar;
   height: 100%;
-  background-color:#F3F3F3;
+  background-color:#293649;
   overflow-y: auto;
   transition: all 0.5s;
   -webkit-transition: all 0.5s;
@@ -147,8 +158,9 @@ body, html {
 }
 
 .vjlogo{
-  width: 190px;
-  margin-top: -20px;
+  width: 170px;
+  height: 65px;
+ 
 }
 /* End Sidebar  */
 
@@ -244,9 +256,110 @@ p{
   margin-top: 60px;
   height: 300px;
 }
+.title {
+  border-bottom: 1px solid #DFDFDF;
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  height: 50px;
+  padding-bottom: 10px;
+  /* margin-top: 20px; */
+  font-size: 20px;
+}
 
+select {
+  width: 100%; /* Full width on mobile */
+  padding: 10px; /* Padding for better touch targets */
+  font-size: 16px; /* Larger font size for readability */
+  border: 1px solid #ccc; /* Border styling */
+  border-radius: 4px; /* Rounded corners */
+  background-color: #fff; /* Background color */
+  -webkit-appearance: none; /* Remove default styling on iOS */
+  -moz-appearance: none; /* Remove default styling on Firefox */
+  appearance: none; /* Remove default styling on modern browsers */
+  margin: 10px 0; /* Margin for spacing */
+}
+
+/* Add a down arrow icon for custom styling */
+.select-wrapper {
+  position: relative;
+}
+
+.select-wrapper::after {
+  content: '▼'; /* Unicode for down arrow */
+  font-size: 16px;
+  color: #333;
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
 /* End Main  */
+/* .collapsible-content {
+  transition: max-height 0.3s ease-out;
+  max-height: 0;
+  overflow: hidden;
+}
 
+.collapsible-content.collapsed {
+  max-height: 0;
+}
+
+.collapsible-content:not(.collapsed) {
+  max-height: 1000px; 
+} */
+.custom-select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 200px; /* Width of the select box */
+}
+
+/* Select box styles */
+.custom-select {
+  position: relative;
+  width: 100%;
+  background: #fff;
+  cursor: pointer;
+}
+
+.custom-select-trigger {
+  display: block;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  text-align: left;
+}
+
+.custom-options {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: auto; /* Make the dropdown wider */
+  min-width: 100%; /* Ensure it’s at least as wide as the select box */
+  background: #fff;
+  border: 1px solid #ccc;
+  z-index: 99;
+}
+
+.custom-option {
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  white-space: nowrap; /* Prevent wrapping */
+}
+
+/* Show dropdown options on select box click */
+.custom-select.open .custom-options {
+  display: block;
+}
+
+/* Option hover styles */
+.custom-option:hover {
+  background: #f0f0f0;
+}
 
 /* Medium <= 992px */
   
@@ -259,9 +372,9 @@ p{
       'main';
   }
 
-  #sidebar {
+  /* #sidebar {
     display: none;
-  }
+  } */
 
   .menu-icon {
     display: inline;
@@ -270,6 +383,18 @@ p{
   .sidebar-title > span {
     display: inline;
   }
+  .menu-icon {
+    /* display: inline; */
+    display: none
+}
+.form-body {
+  /* padding-left: 15px; */
+  /* padding-top: 10px; */
+  height: auto;
+  margin-top: 10px;
+  gap: 20px;
+}
+
 }
 /* Small <= 768px */
   
@@ -286,8 +411,16 @@ p{
   }
   .vjlogo{
     width: 150px;
-    margin-top: -20px;
+    /* margin-top: -20px; */
   }
+  .collapsible-content {
+    display: block !important;
+  }
+
+  .toggle-button {
+    display: none;
+  }
+
 }
 
 /* Extra Small <= 576px */
@@ -297,11 +430,48 @@ p{
     display: none;
   }
   .vjlogo{
-    width: 120px;
-    margin-top: -10px;
+    width: 100px;
+    margin-top: 0px;
+    height: 40px;
   }
-  .onboarding-form {
-    padding: 25px;
-    margin-left: 10px
+  .onboarding-form-container ul  {
+    margin-left: -10px
   }
+  .custom-select-wrapper {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: 1400px) {
+.title{
+  display: none;
+}
+}
+
+
+
+@media screen and (max-width: 1400px) {
+
+/* .onboarding-form-container {
+display: none
+} */
+/* .title{
+  display: none;
+} */
+.collapsible-content {
+  transition: max-height 0.3s ease-out;
+  max-height: 0;
+  overflow: hidden;
+}
+
+.collapsible-content.collapsed {
+  max-height: 0;
+  margin-left: 10%;
+}
+
+.collapsible-content:not(.collapsed) {
+  max-height: 1000px; /* Adjust as needed */
+  /* margin-bottom: 30px; */
+  margin-left: 10%;
+}
 }

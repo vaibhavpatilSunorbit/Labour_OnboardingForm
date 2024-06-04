@@ -18,7 +18,6 @@
   /* Add more styles as needed */
   /* Container for the entire form */
 .onboarding-form-container {
-  /* background-color: #f9f9f9; */
   width: 100%;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -33,6 +32,9 @@
   position: relative;
   min-width: 250px;
   height: 50px;
+  width: 100%;
+  max-width: 200px; /* Sets a maximum width for larger screens */
+  box-sizing: border-box;
 }
 
 
@@ -41,8 +43,10 @@
   border: none;
   /* appearance: none; */
   padding: 0 30px 0 15px;
-  width: 100%;
+  /* width: 100%; */
   font-size: 20px;
+  box-sizing: border-box;
+  appearance: none; 
 }
 
 .select-box option:hover {
@@ -50,21 +54,30 @@
   color: black; /* Change the text color on hover */
 }
 
+.labour-ownership {
+  /* width: 100%; */
+  max-width: 400px; /* Adjust as needed for your layout */
+  box-sizing: border-box;
+}
 
+#select-container {
+  width: 100%;
+}
 
 /* Heading style */
 .onboarding-form-container h2 {
   font-size: 20px;
   color: #333;
-  margin-left: 30px;
+  /* margin-left: 30px; */
+  margin-top: 30px;
 }
 .title{
   border-bottom: 1px solid #DFDFDF;
 }
 
 .form-body{
-  padding-left: 15px;
-  padding-top: 10px;
+  /* padding-left: 15px; */
+  /* padding-top: 10px; */
   height: auto;
   margin-top: 30px;
   gap: 20px;
@@ -79,18 +92,18 @@
 /* Label styles */
 .onboarding-form label {
   font-weight: 400;
-  font-size: 13px;
+  font-size: 16px;
   margin-bottom: 8px;
 }
 
 /* Input styles */
 .onboarding-form input{
-  padding: 12px;
-  margin-bottom: 20px;
+  padding: 8px 8px 13px 8px;
+  margin-bottom: 10px;
   border: 2px solid #ccc;
   border-radius: 4px;
   font-size: 16px;
-  width: 250px;
+  width: 258px;
   color: #B5B5B5;
   font-weight: 500;
   height: 18px;
@@ -102,8 +115,8 @@
 }
 
 .input-with-icon input[type="file"] {
-  padding-left: 35px; /* Adjust to make space for the icon */
-  padding: 12px;
+  padding: 6px 14px 13px 11px; /* Adjust to make space for the icon */
+  /* padding: 12px; */
   margin-bottom: 20px;
   border: 2px solid #ccc;
   border-radius: 4px;
@@ -126,7 +139,7 @@
 
 .onboarding-form select,
 .onboarding-form select{
-  padding: 12px;
+  padding: 8px;
   margin-bottom: 20px;
   border: 2px solid #ccc;
   border-radius: 4px;
@@ -134,11 +147,13 @@
   width: 276px;
   color: #B5B5B5;
   font-weight: 300;
-  height: 45px;
+  height: 43px;
 
 }
 
-
+li{
+  list-style-type: none
+}
 
 
 .onboarding-form input:focus,
@@ -165,9 +180,9 @@
   background-color: #0056b3;
 }
 
-.gender-input{
+/* .gender-input{
   width: 500px;
-}
+} */
 .name-contact{
   display: flex;
   border: none;
@@ -209,6 +224,14 @@ select option{
   border-radius: none;
   height: 50px;
 }
+.capturePhoto{
+  height: 80px;
+  width: 70px;
+  display: flex;
+}
+
+
+
 /* Responsive design */
 @media (max-width: 600px) {
   .onboarding-form-container {
@@ -218,7 +241,7 @@ select option{
   
   .onboarding-form input,
   .onboarding-form select {
-    font-size: 12px;
+    font-size: 14px;
   }
 }
 
@@ -240,7 +263,7 @@ select option{
   font-size: 15px;
   width: 200px;
   border-radius: 10px;
-  margin-right: 100px;
+  margin-right: 110px;
   
 }
 .address-suggestions {
@@ -264,6 +287,7 @@ select option{
 .address-suggestion:hover {
   background-color: #f0f0f0;
 }
+
 
 /* const handleAddressChange = async (e) => {
   const address = e.target.value;
@@ -340,9 +364,10 @@ select option{
 
 /* Small devices (phones, 600px and down) */
 @media (max-width: 600px) {
-  .onboarding-form {
+  /* .onboarding-form {
     padding: 15px;
-  }
+    margin-left: 27px;
+  } */
 
   .onboarding-form h2 {
     font-size: 1.5rem;
@@ -351,13 +376,103 @@ select option{
   .onboarding-form button {
     font-size: 14px;
   }
+  .labour-adhaar {
+    display: flex;
+    border: none;
+    gap: 2px;
+    flex-direction: column;
+}
+.name-contact{
+  display: flex;
+  border: none;
+  gap: 2px;
+  flex-direction: column;
+}
+.birth-aadhaar {
+  display: flex;
+  border: none;
+  gap: 2px;
+  flex-direction: column;
+}
+.locations {
+  display: flex;
+  border: none;
+  gap: 2px;
+  flex-direction: column;
+}
+.state-block {
+  display: flex;
+  border: none;
+  gap: 2px;
+  flex-direction: column;
+}
+.em-contact-block {
+  display: flex;
+  border: none;
+  gap: 2px;
+  flex-direction: column;
+}
+.state-block {
+  display: flex;
+  border: none;
+  gap: 2px;
+  flex-direction: column;
+}
+.onboarding-form-container h2 {
+  color: #333;
+  font-size: 20px;
+  margin-left: 30px;
+  margin-top: 30px;
+  display: none;
+}
+hr{
+  display: none;
+}
+.labour-ownership {
+  max-width: 100%; /* Ensures full width on mobile devices */
+}
+
+.detail-icons{
+  display: inline;
+  padding-left: 17vh;
+  
+}
+.detail-icons1{
+  display: inline;
+  padding-left: 27.8vh;
+  
+}
+.detail-icons2{
+  display: inline;
+  padding-left: 21.4vh;
+  
+}
+.detail-icons3{
+  display: inline;
+  padding-left: 23.8vh;
+  
+}
+ /* .select-box {
+    width: 100%;
+    max-width: 100%; 
+  }
+.select-box option {
+  width: 100%;
+  box-sizing: border-box;
+} */
+.save-btn{
+  float: right;
+  margin-top: 20%;
+}
+
+
 }
 
 /* Medium devices (tablets, 600px to 900px) */
 @media (min-width: 601px) and (max-width: 900px) {
-  .onboarding-form {
+  /* .onboarding-form {
     padding: 20px;
-  }
+  } */
 
   .onboarding-form h2 {
     font-size: 1.75rem;
@@ -370,9 +485,9 @@ select option{
 
 /* Large devices (desktops, 900px and up) */
 @media (min-width: 901px) {
-  .onboarding-form {
+  /* .onboarding-form {
     padding: 25px;
-  }
+  } */
 
   .onboarding-form h2 {
     font-size: 2rem;
@@ -381,4 +496,7 @@ select option{
   .onboarding-form button {
     font-size: 16px;
   }
+  /* .onboarding-form-container ul{
+display: none
+  } */
 }

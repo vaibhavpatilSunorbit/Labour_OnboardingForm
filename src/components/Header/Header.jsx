@@ -28,6 +28,7 @@ import React from 'react'
 import {BsFillBellFill,BsIconName , BsFillEnvelopeFill, BsPersonCircle, BsSearch, BsJustify}
  from 'react-icons/bs';
  import { BiLogOut } from 'react-icons/bi';
+ import VJLogo from "../../images/VJlogo-1-removebg.png";
 
 function Header({OpenSidebar}) {
   return (
@@ -36,7 +37,7 @@ function Header({OpenSidebar}) {
             <BsJustify className='icon' onClick={OpenSidebar}/>
         </div>
         <div className='header-left'>
-            {/* <BsSearch  className='icon'/> */}
+            <img src={VJLogo} className="vjlogo" alt="logo"/>
             
         </div>
         <div className='header-right' className="headericon">
@@ -49,3 +50,13 @@ function Header({OpenSidebar}) {
 }
 
 export default Header;
+
+
+
+
+
+
+
+
+
+
