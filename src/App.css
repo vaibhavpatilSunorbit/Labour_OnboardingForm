@@ -1,9 +1,11 @@
+*{
+  font-family: 'Roboto', sans-serif;
+}
 
 body, html {
-  height: 100%;
-  margin: 0;
-  font-family: Arial, sans-serif;
-  overflow-y: hidden;
+  /* height: 100%; */
+  font-family: 'Roboto', sans-serif;
+  /* overflow-y: hidden; */
 }
 
 .app {
@@ -14,10 +16,23 @@ body, html {
 
 .main-content {
   display: flex;
-  flex: 1; /* This will make it take the remaining vertical space */
+  flex: 1; 
+}
+form {
+  font-family: 'Roboto', sans-serif;
 }
 
+h1, h2, h3 {
+  font-weight: 700;
+}
 
+p, label, input, select, textarea {
+  font-weight: 400;
+}
+
+input[type="submit"] {
+  font-weight: 500; /* Medium */
+}
 
 
 /* body {
@@ -73,7 +88,7 @@ body, html {
 /* Header  */
 .header {
   grid-area: header;
-  height: 80px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -88,6 +103,7 @@ body, html {
 
 .headericon{
   color: black;
+  font-size: 20px;
   
 }
 .headericon .icon{
@@ -277,7 +293,7 @@ select {
   -webkit-appearance: none; /* Remove default styling on iOS */
   -moz-appearance: none; /* Remove default styling on Firefox */
   appearance: none; /* Remove default styling on modern browsers */
-  margin: 10px 0; /* Margin for spacing */
+
 }
 
 /* Add a down arrow icon for custom styling */
@@ -435,14 +451,15 @@ select {
     height: 40px;
   }
   .onboarding-form-container ul  {
-    margin-left: -10px
+    margin-left: -10px;
+    width: 90%
   }
   .custom-select-wrapper {
     width: 100%;
   }
 }
 
-@media screen and (min-width: 1400px) {
+@media screen and (min-width: 1200px) {
 .title{
   display: none;
 }
@@ -450,7 +467,7 @@ select {
 
 
 
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 1200px) {
 
 /* .onboarding-form-container {
 display: none

@@ -1,8 +1,9 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { InputLabel } from '@mui/material';
 import "./OnBoardingForm.css";
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditNoteIcon from '@mui/icons-material/EditNote';
@@ -12,9 +13,8 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-
-
+import CameraAltIcon from '@mui/icons-material/CameraAlt'; // Import the camera_alt icon
+import { FaArrowLeft, FaEye, FaCheck } from 'react-icons/fa';
 
 
 const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
@@ -22,16 +22,34 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [suggestions, setSuggestions] = useState([]);
-  const [photoData, setPhotoData] = useState(null);
+  // const [photoData, setPhotoData] = useState(null);
   const [aadhaarImage, setAadhaarImage] = useState(null);
-  const [isKYCCollapsed, setIsKYCCollapsed] = useState(true);
+  const [isKYCCollapsed, setIsKYCCollapsed] = useState(false);
   const [isPersonalCollapsed, setIsPersonalCollapsed] = useState(true);
   const [isBankDetailsCollapsed, setIsBankDetailsCollapsed] = useState(true);
   const [isProjectCollapsed, setIsProjectCollapsed] = useState(true);
   const [kycCompleted, setKycCompleted] = useState(false);
   const [projectCompleted, setProjectCompleted] = useState(false);
-  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  // const cameraViewRef = useRef(null);
+  // const photoCanvasRef = useRef(null);
+  // const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [error, setError] = useState('');
+  const [newError, setNewError] = useState('');
+  const [hover, setHover] = useState(false);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [uploadAadhaarFront, setuploadAadhaarFront] = useState('');
+  const [uploadAadhaarBack, setuploadAadhaarBack] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
+  const [popupType, setPopupType] = useState('');
+
   const [formData, setFormData] = useState({
+    uploadAadhaarFront: '',
+    uploadAadhaarBack: '',
     name: '',
     aadhaarNumber: '',
     dateOfBirth: '',
@@ -44,16 +62,21 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
     district: '',
     village: '',
     state: '',
-    emergencyContact:'',
+    emergencyContact: '',
+    photoSrc: '',
     labourOwnership: '',
     bankName: '',
     branch: '',
     accountNumber: '',
     ifscCode: '',
-    jobRole: '',
-    jobLocation: '',
+    // jobRole: '',
+    // jobLocation: '',
     contractorName: '',
     contractorNumber: '',
+    projectName: '',
+    labourCategory: '',
+    department: '',
+    workingHours: '',
   });
 
   const [formStatus, setFormStatus] = useState({
@@ -62,6 +85,221 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
     bankDetails: false,
     project: false
   });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handlePrevious = (route) => {
+    navigate(route);
+  };
+
+  const handleNext = (route) => {
+    navigate(route);
+  };
+
+
+  useEffect(() => {
+    // Navigate to /kyc when the component mounts
+    navigate('/kyc');
+  }, []);
+
+ 
+
+  const handleSearch = async (e) => {
+    e.preventDefault(); 
+    if (searchQuery.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+    try {
+      const response = await axios.get(`http://localhost:5000/labours/search?q=${searchQuery}`);
+      setSearchResults(response.data); // Set search results based on API response
+    } catch (error) {
+      console.error('Error searching:', error);
+      toast.error('Error searching. Please try again.'); 
+    }
+    
+  };
+
+  
+  
+  // const openCamera = async () => {
+  //   try {
+  //     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  //     if (cameraViewRef.current) {
+  //       cameraViewRef.current.srcObject = stream;
+  //       cameraViewRef.current.play();
+  //       setIsCameraOpen(true);
+  //     }
+  //   } catch (err) {
+  //     console.error('Error accessing camera:', err);
+  //   }
+  // };
+
+  // const closeCamera = () => {
+  //   if (cameraViewRef.current && cameraViewRef.current.srcObject) {
+  //     cameraViewRef.current.srcObject.getTracks().forEach(track => track.stop());
+  //     setIsCameraOpen(false);
+  //   }
+  // };
+
+  // const capturePhoto = () => {
+  //   const context = photoCanvasRef.current.getContext('2d');
+  //   const cameraView = cameraViewRef.current;
+  //   const photoCanvas = photoCanvasRef.current;
+
+  //   photoCanvas.width = cameraView.videoWidth;
+  //   photoCanvas.height = cameraView.videoHeight;
+  //   context.drawImage(cameraView, 0, 0, photoCanvas.width, photoCanvas.height);
+
+  //   const imageData = photoCanvas.toDataURL('image/jpeg');
+  //   setPhotoData(imageData);
+  // };
+
+  // const handlePhotoFieldClick = () => {
+  //   if (!isCameraOpen) {
+  //     openCamera();
+  //   }
+  // };
+  // Rest of your component code...
+
+  // const CameraCapture = () => {
+  const [stream, setStream] = useState(null);
+  const [photoSrc, setPhotoSrc] = useState('');
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoRef.current.srcObject = stream;
+      setStream(stream);
+    } catch (err) {
+      console.error("Error accessing camera: ", err);
+    }
+  };
+
+  const capturePhoto = () => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    const context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const photo = canvas.toDataURL('image/png');
+    setPhotoSrc(photo);
+    stopCamera();
+  };
+
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+  };
+
+  const repeatPhoto = () => {
+    setPhotoSrc('');
+    startCamera();
+  };
+
+  const handleSelectLabour = (labour) => {
+    const {
+      labourOwnership,
+      name,
+      aadhaarNumber,
+      dateOfBirth,
+      contactNumber,
+      gender,
+      dateOfJoining,
+      address,
+      pincode,
+      taluka,
+      district,
+      village,
+      state,
+      emergencyContact,
+      photoSrc,
+      bankName,
+      branch,
+      accountNumber,
+      ifscCode,
+      projectName,
+      labourCategory,
+      department,
+      workingHours,
+      contractorName,
+      contractorNumber
+    } = labour;
+  
+    // Set formData state with all fields from the selected labour
+    setFormData({
+      labourOwnership,
+      name,
+      aadhaarNumber,
+      dateOfBirth,
+      contactNumber,
+      gender,
+      dateOfJoining,
+      address,
+      pincode,
+      taluka,
+      district,
+      village,
+      state,
+      emergencyContact,
+      photoSrc,
+      bankName,
+      branch,
+      accountNumber,
+      ifscCode,
+      projectName,
+      labourCategory,
+      department,
+      workingHours,
+      contractorName,
+      contractorNumber
+      // Add more fields as necessary
+    });
+  
+    // Clear search query and results
+    setSearchQuery('');
+    setSearchResults([]);
+  
+    console.log('Selected Labour:', labour);
+  };
+  
+
+
+
+  //this is preview Model functionality
+  const renderPreviewModal = () => {
+    if (!isModalOpen) return null;
+    return (
+      <div className="overlay">
+        <div className="preview-modal">
+          <button id="close-button" onClick={closeModal}></button>
+          <ul>
+            {Object.entries(formData).map(([key, value]) => (
+              <li key={key}>
+                <strong>{capitalizeFirstLetter(key)}:</strong> {value}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
+  };
+
+  // Function to capitalize the first letter of a string
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
 
   const toggleKYCCollapse = () => {
     setIsKYCCollapsed(!isKYCCollapsed);
@@ -109,11 +347,9 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
 
   const validateForm = () => {
     const requiredFields = [
-       'name', 'aadhaarNumber', 'dateOfBirth', 'contactNumber', 'gender', 'dateOfJoining', 
-      'address', 'pincode', 'taluka', 'district', 'village', 'state', 
-      'emergencyContact', 'bankName', 'branch', 'accountNumber', 'ifscCode', 
-      // 'jobRole', 'jobLocation',
-      //  'contractorName','contractorNumber'
+      'name', 'aadhaarNumber', 'dateOfBirth', 'contactNumber', 'gender', 'dateOfJoining',
+      'address', 'pincode', 'taluka', 'district', 'village', 'state',
+      'emergencyContact', 'bankName', 'branch', 'accountNumber', 'ifscCode',
     ];
 
     for (const field of requiredFields) {
@@ -129,28 +365,238 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
 
     return true;
   };
-  const handleSubmit = (e) => {
+
+  //   const handleSubmit = async (e) => {
+  //     e.preventDefault();
+  //     if (!validateForm()) return;
+
+  //     try {
+  //       formData.photoSrc = photoSrc;
+  //     console.log("formData", formData);
+
+  //       const responses = await Promise.all([
+  //         axios.post('http://localhost:5000/labours', formData), 
+  //     ]);
+  //       responses.forEach((response, index) => {
+  //           console.log(`${index + 1}. Form submission response:`, response.data);
+  //           toast.success(`Form ${index + 1} submitted successfully!`);
+  //       });
+
+  //       onFormSubmit(formType);
+  //   } catch (error) {
+  //       console.error('Form submission error:', error);
+  //       toast.error("Error submitting form. Please try again later.");
+  //   }
+  // };
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!validateForm()) return;
+
+  //   setLoading(true);
+
+  //   try {
+  //     const formDataToSend = new FormData();
+
+  //     Object.keys(formData).forEach(key => {
+  //       formDataToSend.append(key, formData[key]);
+  //     });
+
+  //     if (uploadAadhaarFront && uploadAadhaarFront instanceof File) {
+  //       formDataToSend.append('uploadAadhaarFront', uploadAadhaarFront, uploadAadhaarFront.name);
+  //     } else {
+  //       console.error('uploadAadhaarFront is not a file object');
+  //     }
+
+  //     if (uploadAadhaarBack && uploadAadhaarBack instanceof File) {
+  //       formDataToSend.append('uploadAadhaarBack', uploadAadhaarBack, uploadAadhaarBack.name);
+  //     } else {
+  //       console.error('uploadAadhaarBack is not a file object');
+  //     }
+
+  //     if (photoSrc && photoSrc instanceof File) {
+  //       formDataToSend.append('photoSrc', photoSrc, photoSrc.name);
+  //     } else {
+  //       console.error('photoSrc is not a file object');
+  //     }
+
+  //     const response = await axios.post('http://localhost:5000/labours', formDataToSend, {
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data',
+  //       },
+  //     });
+
+  //     if (response.status !== 200) {
+  //       throw new Error('Form submission failed');
+  //     }
+
+  //     console.log('Form submission response:', response.data);
+  //     toast.success('Form submitted successfully!');
+
+  //     setFormData({});
+  //     setuploadAadhaarFront(null);
+  //     setuploadAadhaarBack(null);
+  //     setPhotoSrc(null);
+
+  //   } catch (error) {
+  //     console.error('Form submission error:', error);
+  //     toast.error('Error submitting form. Please try again later.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
+  const base64ToBlob = (base64, mimeType) => {
+    const byteString = atob(base64.split(',')[1]);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const intArray = new Uint8Array(arrayBuffer);
+
+    for (let i = 0; i < byteString.length; i++) {
+      intArray[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([intArray], { type: mimeType });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    console.log(`Submitting ${formType} form`, formData);
-    onFormSubmit(formType);
+    setLoading(true);
 
-    if (formType === "kyc") {
-      setKycCompleted(true);
-    } else if (formType === "project") {
-      setProjectCompleted(true);
+    try {
+      const formDataToSend = new FormData();
+
+      Object.keys(formData).forEach(key => {
+        formDataToSend.append(key, formData[key]);
+      });
+
+      if (uploadAadhaarFront && uploadAadhaarFront instanceof File) {
+        formDataToSend.append('uploadAadhaarFront', uploadAadhaarFront, uploadAadhaarFront.name);
+      } else {
+        console.error('uploadAadhaarFront is not a file object');
+      }
+
+      if (uploadAadhaarBack && uploadAadhaarBack instanceof File) {
+        formDataToSend.append('uploadAadhaarBack', uploadAadhaarBack, uploadAadhaarBack.name);
+      } else {
+        console.error('uploadAadhaarBack is not a file object');
+      }
+
+      if (photoSrc) {
+        const photoBlob = base64ToBlob(photoSrc, 'image/jpeg');
+        formDataToSend.append('photoSrc', photoBlob, 'captured_photo.jpg');
+      }
+
+      const response = await axios.post('http://localhost:5000/labours', formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.status !== 201) {
+        throw new Error('Form submission failed');
+      }
+
+      console.log('Form submission response:', response.data);
+      setPopupMessage('Your details have been successfully submitted. Thanks!');
+      setPopupType('success');
+      setSaved(true);
+      // toast.success('Form submitted successfully!');
+
+      setFormData({});
+      setuploadAadhaarFront(null);
+      setuploadAadhaarBack(null);
+      setPhotoSrc(null);
+
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setPopupMessage('Error submitting form. Please try again later.');
+      setPopupType('error');
+      setSaved(true);
+      // toast.error('Error submitting form. Please try again later.');
+    } finally {
+      setLoading(false);
     }
-
-    toast.success("Form submitted successfully!");
+    setTimeout(() => {
+      setSaved(false);
+    }, 9000);
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+    setSearchQuery(value);
+  };
+
+  // const handleFileChange = async (event) => {
+  //   const { name, files } = event.target;
+  //   const file = files[0];
+
+  //   if (!file) return;
+
+  //   console.log("Selected file:", file);
+
+  //   // Set the file state
+  //   if (name === 'uploadAadhaarFront') {
+  //     setuploadAadhaarFront(file);
+  //   } else if (name === 'uploadAadhaarBack') {
+  //     setuploadAadhaarBack(file);
+  //   } else if (name === 'photoSrc') {
+  //     setPhotoSrc(file);
+  //   }
+
+
+  //   // Existing logic
+  //   setLoading(true);
+  //   try {
+  //     await uploadAadhaarImageToSurepass(file);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  //   setLoading(false);
+  // };
+
+  const handleFileChange = async (event) => {
+    const { name, files } = event.target;
+    const file = files[0];
+  
+    if (!file) return;
+  
     console.log("Selected file:", file);
-    setAadhaarImage(file);
-    uploadAadhaarImageToSurepass(file);
+  
+    // Define a mapping for setting file state dynamically
+    const fileStateSetter = {
+      uploadAadhaarFront: setuploadAadhaarFront,
+      uploadAadhaarBack: setuploadAadhaarBack,
+      photoSrc: setPhotoSrc,
+      // Add more mappings as needed
+    };
+  
+    // Set the file state based on name
+    const setStateFunction = fileStateSetter[name];
+    if (setStateFunction) {
+      setStateFunction(file);
+    } else {
+      console.error(`Unknown file input name: ${name}`);
+      return;
+    }
+  
+    // Existing logic (loading state and file upload)
+    setLoading(true);
+    try {
+      await uploadAadhaarImageToSurepass(file); // Example upload function
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+    setLoading(false);
   };
+  
 
 
   const uploadAadhaarImageToOCRSpace = async (file) => {
@@ -179,33 +625,67 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
       console.error('Error uploading Aadhaar image to OCR.space:', error);
     }
   };
-  const handlePincodeChange = async (e) => {
-    const pincode = e.target.value;
-    setFormData({ ...formData, pincode });
 
-    if (pincode.length === 6) {
-      try {
-        const response = await axios.get(`https://api.postalpincode.in/pincode/${pincode}`);
 
-        if (response.data && response.data[0] && response.data[0].Status === "Success") {
-          const postOffice = response.data[0].PostOffice[0];
-          setFormData((prevFormData) => ({
-            ...prevFormData,
-            village: postOffice.Name,
-            taluka: postOffice.Block,
-            district: postOffice.District,
-            state: postOffice.State
-          }));
-        } else {
-          console.error('Location data not found');
-        }
-      } catch (error) {
-        console.error('Error fetching location data:', error);
-      }
+
+
+  const fetchPincodeData = async (pincode) => {
+    try {
+      const response = await axios.get(`https://api.postalpincode.in/pincode/${pincode}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching pincode data:', error);
+      return null;
     }
   };
 
+  const handlePincodeChange = async (e) => {
+    const pincode = e.target.value;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      pincode,
+      village: "",
+      taluka: "",
+      district: "",
+      state: ""
+    }));
 
+    if (pincode.length === 6) {
+      setLoading(true);
+      const response = await fetchPincodeData(pincode);
+
+      if (response && response[0] && response[0].Status === "Success") {
+        setSuggestions(response[0].PostOffice);
+        setShowSuggestions(true);
+      } else {
+        // Fetch nearby pincodes based on the first 4 digits
+        const nearbyPincode = pincode.substring(0, 4);
+        const nearbyResponse = await fetchPincodeData(nearbyPincode);
+
+        if (nearbyResponse && nearbyResponse[0] && nearbyResponse[0].Status === "Success") {
+          setSuggestions(nearbyResponse[0].PostOffice);
+          setShowSuggestions(true);
+        } else {
+          console.error('Location data not found');
+          setShowSuggestions(false);
+        }
+      }
+      setLoading(false);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+  const handleSuggestionClick = (suggestion) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      village: suggestion.Name,
+      taluka: suggestion.Block,
+      district: suggestion.District,
+      state: suggestion.State,
+      pincode: suggestion.Pincode
+    }));
+    setShowSuggestions(false);
+  };
 
   const uploadAadhaarImageToSurepass = async (file) => {
     const formData = new FormData();
@@ -266,25 +746,103 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
     setSuggestions([]);
   };
 
-  const handlePhotoChange = (event) => {
-    const file = event.target.files[0];
+
+
+  function handlePhotoChange(event) {
+    const file = event.target.files[0]; // Get the first selected file
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoData(reader.result);
-        if (typeof onPhotoCapture === 'function') {
-          onPhotoCapture(file);
-        }
+      const reader = new FileReader(); // Create a new FileReader object
+      reader.onload = function (e) {
+        const imageData = e.target.result; // Get the data URL representing the file
+        // Now you can use imageData as the source for an image element or store it in state
+        console.log("Image data:", imageData);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); // Read the file as a data URL
+    }
+  }
+
+  const validateContactNumber = (number) => {
+    const isValid = /^\d{10}$/.test(number);
+    if (!isValid) {
+      setError('Contact 10-digit number.');
+    } else {
+      setError('');
     }
   };
+
+  const validateAadhaarNumber = (number) => {
+    const isValid = /^\d{12}$/.test(number);
+    if (!isValid) {
+      setNewError('Aadhaar 12-digit number.');
+    } else {
+      setNewError('');
+    }
+  };
+
+  const handleContactNumberChange = (e) => {
+    const { value } = e.target;
+    setFormData({ ...formData, contactNumber: value });
+    validateContactNumber(value);
+  };
+
+  const handleContractorNumberChange = (e) => {
+    const { value } = e.target;
+    setFormData({ ...formData, contractorNumber: value });
+    validateContactNumber(value);
+  };
+
+
+
+  const handleemergencyContactChange = (e) => {
+    const { value } = e.target;
+    setFormData({ ...formData, emergencyContact: value });
+    validateContactNumber(value);
+  };
+  const handleAadhaarNumberChange = (e) => {
+    const { value } = e.target;
+    setFormData({ ...formData, aadhaarNumber: value });
+    validateAadhaarNumber(value);
+  };
+
+
   return (
     <div className="onboarding-form-container">
       <ToastContainer />
+      <div className="search-bar">
+        <form onSubmit={handleSearch}>
+          <input
+            type="text"
+            placeholder="Search by Aadhaar number or Name"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              if (e.target.value.trim() === '') {
+                setSearchResults([]); // Clear search results when input is cleared
+              }
+            }}
+          />
+          <button type="submit">Search</button>
+        </form>
+
+      
+        {searchResults.length > 0 && (
+          <div className="search-results">
+            <ul>
+              {searchResults.map((result) => (
+                <li key={result.id}>
+                  {result.name} - {result.aadhaarNumber}
+                  <button onClick={() => handleSelectLabour(result)}>Select</button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+
       <form className="onboarding-form" onSubmit={handleSubmit}>
         <ul>
-          
+
           <li>
             <div className="title" onClick={toggleKYCCollapse}>
               <PersonOutlineIcon />
@@ -293,13 +851,13 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
               <Link to="/kyc" className="sidebar-link">
                 <span className="mains">KYC</span>
                 <div className="detail-icons1">
-                {isKYCCollapsed ? <ExpandMoreIcon/> : <ExpandLessIcon  />}
+                  {isKYCCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                 </div>
               </Link>
-            
-              
+
+
             </div>
-            
+
             <div className={`collapsible-content ${isKYCCollapsed ? 'collapsed' : ''}`}>
               <h2>{formType === "kyc" ? "KYC Form" : "Labour Onboarding Form"}</h2>
               <hr />
@@ -309,7 +867,7 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                     <div className="labour-adhaar">
                       <div className="labour-ownership">
                         <InputLabel id="demo-simple-select-label" sx={{ color: "black" }}>
-                          Labour ownership {renderRequiredAsterisk(true)}
+                          Labour Ownership {renderRequiredAsterisk(true)}
                         </InputLabel>
                         <div id="select-container">
                           <select
@@ -325,12 +883,30 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                         </div>
                       </div>
 
+
+                      {loading && (
+                        <div className="loader-container">
+                          <div className="loader"></div>
+                          <div className="loading-text">Loading...</div>
+                        </div>
+                      )}
                       <div className="project-field">
                         <InputLabel id="aadhaar-label" sx={{ color: "black" }}>
-                          Upload Aadhaar{renderRequiredAsterisk(true)}
+                          Upload Aadhaar Front
                         </InputLabel>
                         <div className="input-with-icon">
-                          <input type="file" onChange={handleFileChange} required />
+                          <input type="file" name="uploadAadhaarFront" onChange={handleFileChange} accept="image/*" required />
+                          <DocumentScannerIcon className="input-icon" />
+                        </div>
+                      </div>
+
+
+                      <div className="project-field">
+                        <InputLabel id="aadhaar-label" sx={{ color: "black" }}>
+                          Upload Aadhaar Back
+                        </InputLabel>
+                        <div className="input-with-icon">
+                          <input type="file" name="uploadAadhaarBack" onChange={handleFileChange} accept="image/*" required />
                           <DocumentScannerIcon className="input-icon" />
                         </div>
                       </div>
@@ -340,9 +916,11 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                     <div className="name-contact">
                       <div className="name">
                         <InputLabel id="demo-simple-select-label" sx={{ color: "black" }}>
-                          Name{renderRequiredAsterisk(true)}
+                          Full Name{renderRequiredAsterisk(true)}
                         </InputLabel>
                         <input
+                          type="text"
+                          name="name"
                           value={formData.name || ''}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                           required
@@ -356,10 +934,13 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                         </InputLabel>
                         <div id="adhaar-input">
                           <input
+                            type="text"
+                            name="aadhaarNumber"
                             value={formData.aadhaarNumber || ''}
-                            onChange={(e) => setFormData({ ...formData, aadhaarNumber: e.target.value })}
+                            onChange={handleAadhaarNumberChange}
                             required
                           />
+                          {newError && <span style={{ color: 'red', display: 'flex' }}>{newError}</span>}
                         </div>
                       </div>
 
@@ -374,7 +955,7 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                           <input
                             className="date-input"
                             type="date"
-                            value={dateOfBirth}
+                            value={formData.dateOfBirth}
                             onChange={(e) => {
                               setDateOfBirth(e.target.value);
                               handleDateChange(e);
@@ -390,13 +971,14 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
 
                       <div className="contact">
                         <InputLabel id="demo-simple-select-label" sx={{ color: "black" }}>
-                          Contact number{renderRequiredAsterisk(true)}
+                          Contact Number{renderRequiredAsterisk(true)}
                         </InputLabel>
                         <input
                           value={formData.contactNumber || ''}
-                          onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
+                          onChange={handleContactNumberChange}
                           required
                         />
+                        {error && <span style={{ color: 'red', display: 'flex' }}>{error}</span>}
                       </div>
 
                     </div>
@@ -418,16 +1000,19 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                         </select>
                       </div>
                     </div>
-
+                    <div className="navigationBut">
+                      {/* <button onClick={() => handlePrevious('/kyc')}>Previous</button> */}
+                      <button onClick={() => handleNext('/personal')}>Next</button>
+                    </div>
                   </>
                 )}
               </div>
             </div>
 
           </li>
-         
 
-          
+
+
 
 
           <li>
@@ -436,13 +1021,13 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
               <span className="bullet" style={{ color: getBulletColor() }}>&#8226;</span>
 
               <Link to="/personal" className="sidebar-link">
-               
+
                 <span className="mains">Personal</span>
                 <div className="detail-icons2">
-                {isPersonalCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                  {isPersonalCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                 </div>
               </Link>
-           
+
             </div>
             <div className={`collapsible-content ${isPersonalCollapsed ? 'collapsed' : ''}`}>
 
@@ -450,24 +1035,25 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
 
                 {formType === "personal" && (
                   <>
-                    <div className="joining-date">
-                      <InputLabel
-                        id="demo-simple-select-label"
-                        sx={{ color: "black" }}
-                      >
-                        Date of joining{renderRequiredAsterisk(true)}
-                      </InputLabel>
-                      <input
-                        className="date-input"
-                        type="date"
-                        id="dateOfJoining"
-                        name="dateOfJoining"
-                        required
-                        onChange={(e) => setFormData({ ...formData, dateOfJoining: e.target.value })}
-                        value={formData.dateOfJoining || ''}
-                      />
-                    </div>
                     <div className="locations">
+                      <div className="joining-date">
+                        <InputLabel
+                          id="demo-simple-select-label"
+                          sx={{ color: "black" }}
+                        >
+                          Date of joining{renderRequiredAsterisk(true)}
+                        </InputLabel>
+                        <input
+                          className="date-input"
+                          type="date"
+                          id="dateOfJoining"
+                          name="dateOfJoining"
+                          required
+                          onChange={(e) => setFormData({ ...formData, dateOfJoining: e.target.value })}
+                          value={formData.dateOfJoining || ''}
+                        />
+                      </div>
+
                       <div className="location-address-label">
                         <InputLabel
                           id="demo-simple-select-label"
@@ -486,6 +1072,15 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                         />
 
                       </div>
+                    </div>
+
+                    {loading && (
+                      <div className="loader-container">
+                        <div className="loader"></div>
+                        <div className="loading-text">Loading...</div>
+                      </div>
+                    )}
+                    <div className="locations">
                       <div className="personal-pincode-field">
                         <InputLabel
                           id="personal-pincode-label"
@@ -502,10 +1097,19 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                           value={formData.pincode || ''}
                           onChange={handlePincodeChange}
                         />
+                        {showSuggestions && suggestions.length > 0 && (
+                          <ul className="suggestions-dropdown">
+                            {suggestions.map((suggestion, index) => (
+                              <li key={index} onClick={() => handleSuggestionClick(suggestion)}>
+                                {suggestion.Name}, {suggestion.Block}, {suggestion.District}, {suggestion.State}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
 
-                    </div>
-                    <div className="locations">
+
+
                       <div className="location-taluka-label">
                         <InputLabel
                           id="demo-simple-select-label"
@@ -523,7 +1127,9 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                           onChange={(e) => setFormData({ ...formData, taluka: e.target.value })}
                         />
                       </div>
+                    </div>
 
+                    <div className="state-block">
                       <div className="location-district-label">
                         <InputLabel
                           id="demo-simple-select-label"
@@ -542,9 +1148,8 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                         />
                       </div>
 
-                    </div>
 
-                    <div className="state-block">
+
                       <div className="location-Village-label">
                         <InputLabel
                           id="demo-simple-select-label"
@@ -562,8 +1167,9 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                           onChange={(e) => setFormData({ ...formData, village: e.target.value })}
                         />
                       </div>
+                    </div>
 
-
+                    <div className="em-contact-block">
                       <div className="location-state-label">
                         <InputLabel
                           id="demo-simple-select-label"
@@ -581,9 +1187,8 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                           onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                         />
                       </div>
-                    </div>
 
-                    <div className="em-contact-block">
+
                       <div className="personal-emcontact-field">
                         <InputLabel
                           id="personal-emcontact-label"
@@ -598,29 +1203,60 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
                           name="personal-emcontact"
                           required
                           value={formData.emergencyContact || ''}
-                          onChange={(e) => setFormData({ ...formData, emergencyContact: e.target.value })}
+                          onChange={handleemergencyContactChange}
                         />
-                      </div>
-
-                      <div className="location-photo-label">
-                        <InputLabel id="demo-simple-select-label" sx={{ color: "black" }}>
-                          Capture Photo
-      </InputLabel>
-                        <input
-                          className="photo"
-                          type="file"
-                          id="photo"
-                          name="photo"
-                          accept="image/*"
-                          capture="environment"
-                          onChange={handlePhotoChange}
-                          required
-                        />
-                        {photoData && (
-                          <img src={photoData} alt="Captured Photo" style={{ maxWidth: "100%" }} className="capturePhoto" />
-                        )}
+                        {error && <span style={{ color: 'red', display: 'flex' }}>{error}</span>}
                       </div>
                     </div>
+
+                    <div className="location-photo-label">
+                      <InputLabel
+                        id="personal-emcontact-label"
+                        sx={{ color: "black" }}
+                      >
+                        Capture Photo{renderRequiredAsterisk(true)}
+                      </InputLabel>
+                      <div className="camera-container">
+                        <div className="video-container" style={{ position: 'relative' }}>
+                          <video ref={videoRef} className="video" autoPlay style={{ display: stream ? 'block' : 'none', width: '100%' }}></video>
+                          <canvas ref={canvasRef} className="canvas" style={{ display: 'none' }}></canvas>
+                          {photoSrc && <img src={photoSrc} alt="Captured" className="photo" style={{ width: '96%', position: 'absolute', top: 0, left: 0 }} />}
+                        </div>
+                        <div className="button-container" style={{ marginTop: '10px' }}>
+                          {!stream && !photoSrc && (
+                            <button onClick={startCamera} className="camerabutton" style={{ width: "278px", border: '2px solid #dfdfdf', borderRadius: '5px',height: '45px' }}>
+                              Start Camera<CameraAltIcon />
+                            </button>
+                          )}
+                          {stream && !photoSrc && (
+                            <button onClick={capturePhoto} className="camerabutton" style={{ width: "278px", border: '2px solid #dfdfdf', borderRadius: '5px',height: '45px' }}>
+                              Capture Photo<CameraAltIcon />
+                            </button>
+                          )}
+                          {!stream && photoSrc && (
+                            <button onClick={repeatPhoto} className="camerabutton" style={{ width: "278px", border: '2px solid #dfdfdf', borderRadius: '5px',height: '45px' }}>
+                              Repeat Photo<CameraAltIcon />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <input
+                        type="hidden"
+                        id="photoInput"
+                        name="photoInput"
+                        value={photoSrc || ''}
+                        required
+                        onChange={(e) => setFormData((prevFormData) => {
+                          console.log("photoInput", e.target.value)
+                          return { ...prevFormData, photoInput: e.target.value }
+                        })}
+                      />
+                       <div className="navigation-buttons">
+                      <button onClick={() => handlePrevious('/kyc')}>Previous</button>
+                      <button onClick={() => handleNext('/bankDetails')} style={{ marginLeft: "10px" }}>Next</button>
+                    </div>
+                    </div>
+                   
                   </>
                 )}
               </div>
@@ -631,84 +1267,91 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
 
           <li>
             <div className="title" onClick={toggleBankDetailsCollapse}>
-         
+
               <AccountBalanceIcon />
-           <span className="bullet" style={{ color: getBulletColor() }}>&#8226;</span>
-           <Link to="/bankDetails" className="sidebar-link">
-           <span className="mains">BankDetails</span>
-              <div className="detail-icons">
-                {isBankDetailsCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-                </div> 
+              <span className="bullet" style={{ color: getBulletColor() }}>&#8226;</span>
+              <Link to="/bankDetails" className="sidebar-link">
+                <span className="mains">BankDetails</span>
+                <div className="detail-icons">
+                  {isBankDetailsCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                </div>
               </Link>
-             
+
             </div>
             <div className={`collapsible-content ${isBankDetailsCollapsed ? 'collapsed' : ''}`}>
               <div className="form-body">
                 {formType === "bankDetails" && (
                   <>
-                    <div className="bankDetails-field">
-                      <InputLabel id="bank-name-label" sx={{ color: "black" }}>
-                        Bank Name{renderRequiredAsterisk(true)}
-                      </InputLabel>
-                      <input
-                        type="text"
-                        id="bankName"
-                        name="bankName"
-                        required
-                        value={formData.bankName || ''}
-                        onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
-                      />
+                    <div className="locations">
+                      <div className="bankDetails-field">
+                        <InputLabel id="bank-name-label" sx={{ color: "black" }}>
+                          Bank Name{renderRequiredAsterisk(true)}
+                        </InputLabel>
+                        <input
+                          type="text"
+                          id="bankName"
+                          name="bankName"
+                          required
+                          value={formData.bankName || ''}
+                          onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="bankDetails-field">
+                        <InputLabel id="branch-label" sx={{ color: "black" }}>
+                          Branch{renderRequiredAsterisk(true)}
+                        </InputLabel>
+                        <input
+                          type="text"
+                          id="branch"
+                          name="branch"
+                          required
+                          value={formData.branch || ''}
+                          onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
+                        />
+                      </div>
                     </div>
 
-                    <div className="bankDetails-field">
-                      <InputLabel id="branch-label" sx={{ color: "black" }}>
-                        Branch{renderRequiredAsterisk(true)}
-                      </InputLabel>
-                      <input
-                        type="text"
-                        id="branch"
-                        name="branch"
-                        required
-                        value={formData.branch || ''}
-                        onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                      />
-                    </div>
+                    <div className="locations">
+                      <div className="bankDetails-field">
+                        <InputLabel id="account-number-label" sx={{ color: "black" }}>
+                          Account Number{renderRequiredAsterisk(true)}
+                        </InputLabel>
+                        <input
+                          type="text"
+                          id="accountNumber"
+                          name="accountNumber"
+                          required
+                          value={formData.accountNumber || ''}
+                          onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
+                        />
+                      </div>
 
-                    <div className="bankDetails-field">
-                      <InputLabel id="account-number-label" sx={{ color: "black" }}>
-                        Account Number{renderRequiredAsterisk(true)}
-                      </InputLabel>
-                      <input
-                        type="text"
-                        id="accountNumber"
-                        name="accountNumber"
-                        required
-                        value={formData.accountNumber || ''}
-                        onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
-                      />
-                    </div>
-
-                    <div className="bankDetails-field">
-                      <InputLabel id="ifsc-label" sx={{ color: "black" }}>
-                        IFSC code{renderRequiredAsterisk(true)}
-                      </InputLabel>
-                      <input
-                        type="text"
-                        id="ifsc"
-                        name="ifsc"
-                        required
-                        value={formData.ifscCode || ''}
-                        onChange={(e) => setFormData({ ...formData, ifscCode: e.target.value })}
-                      />
+                      <div className="bankDetails-field">
+                        <InputLabel id="ifsc-label" sx={{ color: "black" }}>
+                          IFSC code{renderRequiredAsterisk(true)}
+                        </InputLabel>
+                        <input
+                          type="text"
+                          id="ifsc"
+                          name="ifsc"
+                          required
+                          value={formData.ifscCode || ''}
+                          onChange={(e) => setFormData({ ...formData, ifscCode: e.target.value })}
+                        />
+                      </div>
                     </div>
 
                     <div className="bankDetails-field">
                       <InputLabel id="id-card-label" sx={{ color: "black" }}>
-                        Id Card{renderRequiredAsterisk(true)}
+                        Id Proof{renderRequiredAsterisk(true)}
                       </InputLabel>
                       <input type="file" onChange={() => { }} required />
                     </div>
-
+                    <div className="navigationBut">
+                      <button onClick={() => handlePrevious('/personal')}>Previous</button>
+                      <button onClick={() => handleNext('/project')} style={{ marginLeft: "10px" }}>Next</button>
+                    </div>
                   </>
                 )}
               </div>
@@ -718,126 +1361,304 @@ const OnboardingForm = ({ formType, onFormSubmit, onPhotoCapture }) => {
 
           <li>
             <div className="title" onClick={toggleProjectCollapse}>
-           
+
 
               <AssignmentIcon />
-           <span className="bullet" style={{ color: getBulletColor(formStatus.project) }}>&#8226;</span>
+              <span className="bullet" style={{ color: getBulletColor(formStatus.project) }}>&#8226;</span>
 
-           <Link to="/project" className="sidebar-link">
+              <Link to="/project" className="sidebar-link">
                 <span className="mains">Project</span>
                 <div className="detail-icons3">
-                {isProjectCollapsed ? <ExpandMoreIcon  /> : <ExpandLessIcon />}
+                  {isProjectCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                 </div>
               </Link>
-             
+
             </div>
             <div className={`collapsible-content ${isProjectCollapsed ? 'collapsed' : ''}`}>
               <div className="form-body">
                 {formType === "project" && (
                   <>
-                  <div>
-                    <div className="locations">
-                      {formData.labourOwnership === "Contractor" && (
-                        <div className="locations">
-                          <div className="name">
-                            <InputLabel id="demo-simple-select-label" sx={{ color: "black" }}>
-                              Contractor Name{renderRequiredAsterisk(true)}
-                            </InputLabel>
-                            <input
-                              value={formData.contractorName || ''}
-                              onChange={(e) => setFormData({ ...formData, contractorName: e.target.value })}
-                              required
-                            />
+                    <div>
+                      <div className="locations">
+                        {formData.labourOwnership === "Contractor" && (
+                          <div className="locations">
+                            <div className="name">
+                              <InputLabel id="contractor-name-label" sx={{ color: "black" }}>
+                                Contractor Name{renderRequiredAsterisk(true)}
+                              </InputLabel>
+                              <input
+                                value={formData.contractorName || ''}
+                                onChange={(e) => setFormData({ ...formData, contractorName: e.target.value })}
+                                required
+                              />
+                            </div>
+                            <div className="contact">
+                              <InputLabel id="contractor-number-label" sx={{ color: "black" }}>
+                                Contractor Number{renderRequiredAsterisk(true)}
+                              </InputLabel>
+                              <input
+                                value={formData.contractorNumber || ''}
+                                onChange={handleContractorNumberChange}
+                                required
+                              />
+                                {error && <span style={{ color: 'red', display: 'flex' }}>{error}</span>}
+                            </div>
                           </div>
-
-                          <div className="contact">
-                            <InputLabel id="demo-simple-select-label" sx={{ color: "black" }}>
-                              Contractor number{renderRequiredAsterisk(true)}
-                            </InputLabel>
-                            <input
-                              value={formData.contractorNumber || ''}
-                              onChange={(e) => setFormData({ ...formData, contractorNumber: e.target.value })}
+                        )}
+                      </div>
+                      <div className="locations">
+                        <div className="project-field">
+                          <InputLabel id="project-name-label" sx={{ color: "black" }}>
+                            Project Name{renderRequiredAsterisk(true)}
+                          </InputLabel>
+                          <div className="gender-input">
+                            <select
+                              id="projectName"
+                              name="projectName"
+                              value={formData.projectName}
+                              onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
                               required
-                            />
+                            >
+                              <option value="" disabled selected>Select a project</option>
+                              <option value="YashOne Infinitee">YashOne Infinitee</option>
+                              <option value="New Test Project">New Test Project</option>
+                            </select>
                           </div>
                         </div>
-                      )}
-                    </div>
-
-                    <div className="locations">
-                      <div className="project-field">
-                        <InputLabel id="project-name-label" sx={{ color: "black" }}>
-                          Project Name{renderRequiredAsterisk(true)}
-                        </InputLabel>
-                        <div className="gender-input">
-                          <select id="projectName" name="projectName" required>
-                            <option value="YashOne Infinitee">YashOne Infinitee</option>
-                            <option value="New Test Project">New Test Project</option>
-                          </select>
+                        <div className="project-field">
+                          <InputLabel id="labour-category-label" sx={{ color: "black" }}>
+                            Labour Category{renderRequiredAsterisk(true)}
+                          </InputLabel>
+                          <div className="gender-input">
+                            <select
+                              id="labourCategory"
+                              name="labourCategory"
+                              value={formData.labourCategory}
+                              onChange={(e) => setFormData({ ...formData, labourCategory: e.target.value })}
+                              required
+                            >
+                             <option value="" disabled selected>Select a Labour Category</option>
+                              <option value="Skilled">Skilled</option>
+                              <option value="Semi-Skilled">Semi-Skilled</option>
+                              <option value="Unskilled">Unskilled</option>
+                            </select>
+                          </div>
                         </div>
                       </div>
-
-                      <div className="project-field">
-                        <InputLabel id="labour-category-label" sx={{ color: "black" }}>
-                          Labour Category{renderRequiredAsterisk(true)}
-                        </InputLabel>
-                        <div className="gender-input">
-                          <select id="labourCategory" name="labourCategory" required>
-                            <option value="Skilled">Skilled</option>
-                            <option value="Semi-Skilled">Semi-Skilled</option>
-                            <option value="Unskilled">Unskilled</option>
-                          </select>
+                      <div className="locations">
+                        <div className="project-field">
+                          <InputLabel id="department-label" sx={{ color: "black" }}>
+                            Department{renderRequiredAsterisk(true)}
+                          </InputLabel>
+                          <div className="gender-input">
+                            <select
+                              id="department"
+                              name="department"
+                              value={formData.department}
+                              onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                              required
+                            >
+                              <option value="" disabled selected>Select a Department</option>
+                              <option value="Electrical">Electrical</option>
+                              <option value="Plumbing">Plumbing</option>
+                              <option value="CCA">CCA</option>
+                              <option value="EHCS">EHCS</option>
+                              <option value="Firefighting">Firefighting</option>
+                              <option value="MQC">MQC</option>
+                              <option value="FEP">FEP</option>
+                              <option value="E&C">E&C</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="project-field">
+                          <InputLabel id="working-hours-label" sx={{ color: "black" }}>
+                            Working Hours{renderRequiredAsterisk(true)}
+                          </InputLabel>
+                          <div className="gender-input">
+                            <select
+                              id="workingHours"
+                              name="workingHours"
+                              value={formData.workingHours}
+                              onChange={(e) => setFormData({ ...formData, workingHours: e.target.value })}
+                              required
+                            >
+                             <option value="" disabled selected>Select a Working Hours</option>
+                              <option value="8 hours">8 hours</option>
+                              <option value="9 hours">9 hours</option>
+                            </select>
+                          </div>
                         </div>
                       </div>
-                    </div>
-
-                    <div className="locations">
-                      <div className="project-field">
-                        <InputLabel id="department-label" sx={{ color: "black" }}>
-                          Department{renderRequiredAsterisk(true)}
-                        </InputLabel>
-                        <div className="gender-input">
-                          <select id="department" name="department" required>
-                            <option value="Electrical">Electrical</option>
-                            <option value="Plumbing">Plumbing</option>
-                            <option value="CCA">CCA</option>
-                            <option value="EHCS">EHCS</option>
-                            <option value="Firefighting">Firefighting</option>
-                            <option value="MQC">MQC</option>
-                            <option value="FEP">FEP</option>
-                            <option value="E&C">E&C</option>
-                          </select>
+                      <div className="buttons-container">
+                        <div className="navigation-buttons">
+                          {/* <button onClick={() => handleNext('/project')} style={{marginLeft: '10px'}}>Next</button> */}
+                        </div>
+                        <div className="save-btn">
+                          <button
+                            onClick={() => handlePrevious('/bankDetails')}
+                            style={{ marginRight: '10px' }}
+                            className="btn btn-previous"
+                          > Previous
+                           </button>
+                          <button
+                            type="button"
+                            onClick={openModal}
+                            className="btn btn-preview"
+                          > Preview
+                          </button>
+                          <button
+                            type="button"
+                            id="save"
+                            className={`btn btn-save save-button ${saved ? 'saved' : ''}`}
+                            onClick={handleSubmit}
+                          >
+                            {saved ? <FaCheck className="icon" /> : 'Save Details'}
+                          </button>
                         </div>
                       </div>
-
-                      <div className="project-field">
-                        <InputLabel id="working-hours-label" sx={{ color: "black" }}>
-                          Working Hours{renderRequiredAsterisk(true)}
-                        </InputLabel>
-                        <div className="gender-input">
-                          <select id="workingHours" name="workingHours" required>
-                            <option value="8 hours">8 hours</option>
-                            <option value="9 hours">9 hours</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="save-btn">
-            <button type="submit" id="save" className="save-button" onClick={handleSubmit}>Save details</button>
-          </div>
                     </div>
                   </>
                 )}
               </div>
             </div>
           </li>
-         
+          {renderPreviewModal()}
         </ul>
 
       </form>
+     {saved && (
+        <>
+          <div className="overlay"></div>
+          <div className={`popup ${popupType}`}>
+            <h2>{popupType === 'success' ? 'Thank You!' : 'Error'}</h2>
+            <p>{popupMessage}</p>
+            <button className={`ok-button ${popupType}`} onClick={() => setSaved(false)}>
+              <span className={`icon ${popupType}`}>
+                {popupType === 'success' ? '✔' : '✘'}
+              </span> Ok
+            </button>
+          </div>
+        </>
+      )}
+
+      <style jsx>{`
+        body {
+          font-family: 'Roboto', sans-serif;
+          background-color: #f8f9fa;
+        }
+
+        .input-container {
+          margin: 20px 0;
+          position: relative;
+        }
+
+        .input-field {
+          width: 100%;
+          padding: 10px 15px;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          font-size: 16px;
+          outline: none;
+          transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-field:focus {
+          border-color: #007bff;
+          box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        .input-field:hover {
+          border-color: #0056b3;
+        }
+
+        .error-message {
+          color: red;
+          font-size: 14px;
+          margin-top: 5px;
+          display: block;
+        }
+
+        .popup {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          padding: 20px;
+          background: white;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          z-index: 1000;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .popup.success {
+          background-color: #d4edda;
+          border-color: #c3e6cb;
+        }
+
+        .popup.error {
+          background-color: #f8d7da;
+          border-color: #f5c6cb;
+        }
+
+        .popup h2 {
+          margin: 0 0 10px;
+        }
+
+        .popup p {
+          margin: 0 0 20px;
+        }
+
+        .popup .ok-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+
+        .popup .ok-button.success {
+          background-color: #28a745;
+          color: white;
+        }
+
+        .popup .ok-button.error {
+          background-color: #dc3545;
+          color: white;
+        }
+
+        .popup .ok-button:hover.success {
+          background-color: #218838;
+        }
+
+        .popup .ok-button:hover.error {
+          background-color: #c82333;
+        }
+
+        .popup .icon {
+          margin-right: 10px;
+        }
+
+        .overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 999;
+        }
+      `}</style>
     </div>
   );
 };
 
 
 export default OnboardingForm;
+
+
